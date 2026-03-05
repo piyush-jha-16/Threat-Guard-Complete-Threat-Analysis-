@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
-import { UploadCloud, FileCode2, CheckCircle2, ShieldAlert, Loader2, AlertCircle, Box, Cpu } from 'lucide-react';
+import { UploadCloud, FileCode2, CheckCircle2, Loader2, AlertCircle, Box, Cpu } from 'lucide-react';
 
 const Executables: React.FC = () => {
     const [isScanning, setIsScanning] = useState(false);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
-import { AppWindow, CheckCircle2, Loader2, AlertCircle, LayoutDashboard, Database, Activity } from 'lucide-react';
+import { AppWindow, CheckCircle2, LayoutDashboard, Database, Activity } from 'lucide-react';
 
 const Applications: React.FC = () => {
     const [isScanning, setIsScanning] = useState(false);
