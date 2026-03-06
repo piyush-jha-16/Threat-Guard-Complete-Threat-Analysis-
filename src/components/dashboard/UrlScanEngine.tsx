@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Loader2, Globe2, ShieldAlert } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { getHistory } from '../../lib/scanStore';
 
 interface UrlScanEngineProps {
     onScan: (type: string, name: string) => void;
@@ -8,9 +10,32 @@ interface UrlScanEngineProps {
 
 const UrlScanEngine: React.FC<UrlScanEngineProps> = ({ onScan, isScanning }) => {
     const [url, setUrl] = useState('');
+    const [scannedUrl, setScannedUrl] = useState('');
+    const [showResult, setShowResult] = useState(false);
+    const [scanStatus, setScanStatus] = useState<'safe' | 'warning' | 'malicious' | null>(null);
+    const [isLocalScanning, setIsLocalScanning] = useState(false);
+    const prevIsScanning = useRef(isScanning);
+
+    useEffect(() => {
+        if (isLocalScanning && prevIsScanning.current && !isScanning) {
+            setIsLocalScanning(false);
+            const history = getHistory();
+            const latest = history.find(r => r.type === 'URL' && r.fileName === scannedUrl);
+            if (latest) {
+                setScanStatus(latest.status);
+            } else {
+                setScanStatus(null);
+            }
+            setShowResult(true);
+        }
+        prevIsScanning.current = isScanning;
+    }, [isScanning, isLocalScanning, scannedUrl]);
 
     const handleScan = () => {
         if (!url) return;
+        setScannedUrl(url);
+        setShowResult(false);
+        setIsLocalScanning(true);
         onScan('URL', url);
         setUrl('');
     };
@@ -56,6 +81,31 @@ const UrlScanEngine: React.FC<UrlScanEngineProps> = ({ onScan, isScanning }) => 
                                 'Initiate URL Scan'
                             )}
                         </button>
+
+                        {showResult && (
+                            <div className={`w-full p-4 mt-2 border rounded-lg flex flex-col gap-3 shadow-sm transition-all duration-300 ${scanStatus === 'malicious'
+                                    ? 'bg-red-50/50 border-red-200 dark:bg-red-900/10 dark:border-red-900/30'
+                                    : scanStatus === 'safe'
+                                        ? 'bg-green-50/50 border-green-200 dark:bg-[#0f8246]/10 dark:border-[#0f8246]/30'
+                                        : 'bg-white border-gray-200 dark:bg-[#27272a] dark:border-[#3f3f46]'
+                                }`}>
+                                <div className="flex items-center gap-2 text-[14px] text-[#111827] dark:text-white font-medium">
+                                    <ShieldAlert size={16} className={`flex-shrink-0 ${scanStatus === 'malicious' ? 'text-red-600 dark:text-red-500' :
+                                            scanStatus === 'safe' ? 'text-[#0f8246] dark:text-[#1abc63]' :
+                                                'text-gray-500'
+                                        }`} />
+                                    <span className="truncate w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                                        {scanStatus === 'malicious' ? 'Threat Detected:' : scanStatus === 'safe' ? 'No Threats Found:' : 'Scan Finished:'} <span className="opacity-70 font-normal">{scannedUrl}</span>
+                                    </span>
+                                </div>
+                                <Link
+                                    to="/weblinks"
+                                    className="w-full text-center px-4 py-2 bg-[#111827] hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-100 text-white dark:text-[#111827] text-[13px] font-medium rounded-md transition-colors shadow-sm"
+                                >
+                                    View Full Analysis Report
+                                </Link>
+                            </div>
+                        )}
                     </div>
 
                     {/* Small visual accent */}
