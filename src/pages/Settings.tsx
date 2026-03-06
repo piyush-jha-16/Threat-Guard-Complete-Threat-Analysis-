@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { supabase } from '../lib/supabase';
-import { User, Bell, Shield, Key, Globe, Check, AlertTriangle, Monitor, Save } from 'lucide-react';
+import { User, Bell, Shield, Key, Globe, Check, AlertTriangle, Monitor, Save, Clock } from 'lucide-react';
+import { TIMEZONE_OPTIONS, getUTCOffset } from '../lib/timezone';
 
 const Settings: React.FC = () => {
     const navigate = useNavigate();
@@ -20,6 +21,7 @@ const Settings: React.FC = () => {
     const [pushNotifications, setPushNotifications] = useState(false);
     const [activeTab, setActiveTab] = useState('profile');
     const [timeZone, setTimeZone] = useState(localStorage.getItem('timeZone') || 'local');
+    const [liveTime, setLiveTime] = useState('');
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -33,6 +35,35 @@ const Settings: React.FC = () => {
         };
         fetchUser();
     }, []);
+
+    // Live clock — updates every second in the selected timezone
+    useEffect(() => {
+        const tick = () => {
+            const tz = timeZone === 'local'
+                ? Intl.DateTimeFormat().resolvedOptions().timeZone
+                : timeZone;
+            const now = new Date();
+            try {
+                const formatted = new Intl.DateTimeFormat('en-US', {
+                    timeZone: tz,
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                }).format(now);
+                setLiveTime(formatted);
+            } catch {
+                setLiveTime(now.toLocaleString());
+            }
+        };
+        tick();
+        const id = setInterval(tick, 1000);
+        return () => clearInterval(id);
+    }, [timeZone]);
 
     const handleLogoutAll = async () => {
         try {
@@ -386,17 +417,45 @@ const Settings: React.FC = () => {
                                         <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             Time Zone
                                         </label>
+
+                                        {/* Grouped timezone dropdown */}
                                         <select
                                             value={timeZone}
                                             onChange={(e) => setTimeZone(e.target.value)}
-                                            className="px-4 py-2.5 bg-gray-50 dark:bg-[#121212] border border-gray-200 dark:border-[#333] rounded-lg focus:ring-2 focus:ring-[#0f8246] focus:border-transparent transition-all outline-none text-sm w-full md:w-1/2"
+                                            className="px-4 py-2.5 bg-gray-50 dark:bg-[#121212] border border-gray-200 dark:border-[#333] rounded-lg focus:ring-2 focus:ring-[#0f8246] focus:border-transparent transition-all outline-none text-sm w-full"
                                         >
-                                            <option value="local">Local (System Default)</option>
-                                            <option value="America/New_York">Eastern Time (US & Canada)</option>
-                                            <option value="America/Los_Angeles">Pacific Time (US & Canada)</option>
-                                            <option value="UTC">UTC (Coordinated Universal Time)</option>
-                                            <option value="Asia/Kolkata">IST (Indian Standard Time)</option>
+                                            {Array.from(
+                                                TIMEZONE_OPTIONS.reduce((map, tz) => {
+                                                    if (!map.has(tz.region)) map.set(tz.region, []);
+                                                    map.get(tz.region)!.push(tz);
+                                                    return map;
+                                                }, new Map<string, typeof TIMEZONE_OPTIONS>())
+                                            ).map(([region, zones]) => (
+                                                <optgroup key={region} label={`\u2500\u2500 ${region}`}>
+                                                    {zones.map(tz => (
+                                                        <option key={tz.value} value={tz.value}>
+                                                            {tz.label}
+                                                        </option>
+                                                    ))}
+                                                </optgroup>
+                                            ))}
                                         </select>
+
+                                        {/* Live clock preview */}
+                                        <div className="mt-3 flex items-center gap-2.5 px-4 py-3 bg-gray-50 dark:bg-[#121212] border border-gray-200 dark:border-[#2A2A2A] rounded-xl">
+                                            <Clock size={15} className="text-[#0f8246] flex-shrink-0" />
+                                            <div className="min-w-0">
+                                                <p className="text-[11px] text-gray-500 dark:text-[#94a3b8] mb-0.5">
+                                                    Current time in selected zone&nbsp;
+                                                    <span className="font-mono text-[10px] bg-gray-200 dark:bg-[#2A2A2A] px-1.5 py-0.5 rounded">
+                                                        {getUTCOffset(timeZone)}
+                                                    </span>
+                                                </p>
+                                                <p className="text-sm font-mono font-medium text-[#0f8246] truncate">
+                                                    {liveTime}
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
