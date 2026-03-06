@@ -141,7 +141,7 @@ const Settings: React.FC = () => {
         <DashboardLayout>
             <div className="w-full text-[#111827] dark:text-white transition-colors duration-200">
                 {/* Page Header */}
-                <div className="mb-8 mt-2 flex justify-between items-center">
+                <div className="mb-8 mt-2 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div>
                         <h1 className="text-[28px] sm:text-[32px] font-bold tracking-tight">
                             Platform Settings
@@ -316,7 +316,7 @@ const Settings: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between p-4 sm:p-5 bg-gray-50 dark:bg-[#121212] rounded-xl border border-gray-100 dark:border-[#333]">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 sm:p-5 bg-gray-50 dark:bg-[#121212] rounded-xl border border-gray-100 dark:border-[#333]">
                                         <div className="flex items-start">
                                             <Monitor className="text-[#0f8246] mr-4 mt-0.5" size={20} />
                                             <div>

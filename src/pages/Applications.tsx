@@ -42,9 +42,9 @@ const Applications: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Scan Area */}
                     <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] rounded-[14px] p-8 shadow-sm transition-colors duration-200">
+                        <div className="bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] rounded-[14px] p-4 sm:p-8 shadow-sm transition-colors duration-200">
 
-                            <div className={`rounded-xl p-12 flex flex-col items-center justify-center gap-6 relative overflow-hidden transition-all duration-200 min-h-[320px] bg-gray-50 dark:bg-[#18181b]/50 border border-gray-200 dark:border-[#3f3f46]`}>
+                            <div className={`rounded-xl p-8 sm:p-12 flex flex-col items-center justify-center gap-6 relative overflow-hidden transition-all duration-200 min-h-[280px] sm:min-h-[320px] bg-gray-50 dark:bg-[#18181b]/50 border border-gray-200 dark:border-[#3f3f46]`}>
                                 <div className="flex flex-col items-center justify-center space-y-6 z-10 w-full max-w-xl">
                                     <div className={`w-28 h-28 rounded-full flex items-center justify-center shadow-sm relative transition-colors duration-300
                                         ${isScanning

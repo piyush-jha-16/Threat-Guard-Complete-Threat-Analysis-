@@ -68,14 +68,14 @@ const Executables: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Dropzone Area */}
                     <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] rounded-[14px] p-8 shadow-sm transition-colors duration-200">
+                        <div className="bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] rounded-[14px] p-4 sm:p-8 shadow-sm transition-colors duration-200">
 
                             {/* Drag & Drop Zone */}
                             <div
                                 onDragOver={handleDragOver}
                                 onDragLeave={handleDragLeave}
                                 onDrop={handleDrop}
-                                className={`border-2 border-dashed rounded-xl p-12 flex flex-col items-center justify-center gap-6 relative overflow-hidden transition-all duration-200 min-h-[320px] 
+                                className={`border-2 border-dashed rounded-xl p-8 sm:p-12 flex flex-col items-center justify-center gap-6 relative overflow-hidden transition-all duration-200 min-h-[280px] sm:min-h-[320px] 
                                     ${isDragging
                                         ? 'border-[#0f8246] bg-[#0f8246]/5 dark:bg-[#0f8246]/10'
                                         : 'border-gray-300 dark:border-[#3f3f46] bg-gray-50 dark:bg-[#18181b]/50 hover:bg-gray-100 dark:hover:bg-[#27272a]/30'}`}

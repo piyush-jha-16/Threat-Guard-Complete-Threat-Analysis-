@@ -474,8 +474,8 @@ const Weblinks: React.FC = () => {
 
                         {/* Show scan form if no result yet */}
                         {!result && (
-                            <div className="bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] rounded-[14px] p-8 shadow-sm transition-colors duration-200">
-                                <div className={`rounded-xl flex flex-col items-center justify-center gap-6 relative overflow-hidden transition-all duration-200 min-h-[300px] p-10 bg-gray-50 dark:bg-[#18181b]/50 border border-gray-200 dark:border-[#3f3f46]`}>
+                            <div className="bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] rounded-[14px] p-4 sm:p-8 shadow-sm transition-colors duration-200">
+                                <div className={`rounded-xl flex flex-col items-center justify-center gap-6 relative overflow-hidden transition-all duration-200 min-h-[280px] sm:min-h-[300px] p-6 sm:p-10 bg-gray-50 dark:bg-[#18181b]/50 border border-gray-200 dark:border-[#3f3f46]`}>
                                     <div className="flex flex-col items-center justify-center space-y-6 z-10 w-full max-w-xl">
 
                                         {/* State icon */}

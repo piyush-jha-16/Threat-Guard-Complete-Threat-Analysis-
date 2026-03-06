@@ -107,14 +107,14 @@ const Reports: React.FC = () => {
             <div className="animation-fade-in space-y-6">
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
                     <div>
                         <h1 className="text-2xl font-bold text-[#111827] dark:text-white tracking-tight">Intelligence Reports</h1>
                         <p className="text-[#6b7280] dark:text-[#a1a1aa] text-sm mt-1">
                             Review historical scan reports across all engines and compile executive summaries.
                         </p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                         <button
                             onClick={refresh}
                             className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-[#4b5563] dark:text-[#a1a1aa] bg-gray-50 dark:bg-[#27272a]/50 border border-gray-200 dark:border-[#3f3f46] rounded-lg hover:bg-gray-100 dark:hover:bg-[#3f3f46] transition-colors"
@@ -150,7 +150,7 @@ const Reports: React.FC = () => {
                         <div className="bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] rounded-[14px] shadow-sm transition-colors duration-200 flex flex-col h-full min-h-[500px]">
 
                             {/* Toolbar */}
-                            <div className="p-6 border-b border-gray-100 dark:border-[#27272a] flex items-center justify-between gap-3 flex-wrap">
+                            <div className="p-4 sm:p-6 border-b border-gray-100 dark:border-[#27272a] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 flex-wrap">
                                 <h2 className="text-[#111827] dark:text-white font-semibold flex items-center">
                                     <Activity size={18} className="mr-2 text-[#0f8246]" />
                                     Scan History Log
@@ -160,8 +160,8 @@ const Reports: React.FC = () => {
                                         </span>
                                     )}
                                 </h2>
-                                <div className="flex space-x-2 flex-wrap gap-y-2">
-                                    <div className="relative">
+                                <div className="flex gap-2 flex-wrap">
+                                    <div className="relative flex-1 sm:flex-none">
                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <Search size={14} className="text-gray-400" />
                                         </div>
@@ -170,13 +170,13 @@ const Reports: React.FC = () => {
                                             placeholder="Search reports..."
                                             value={search}
                                             onChange={e => setSearch(e.target.value)}
-                                            className="w-48 pl-9 pr-3 py-1.5 text-sm bg-gray-50 dark:bg-[#27272a]/50 border border-gray-200 dark:border-[#3f3f46] text-[#111827] dark:text-white rounded-md focus:outline-none focus:ring-1 focus:ring-[#0f8246] transition-all"
+                                            className="w-full sm:w-48 pl-9 pr-3 py-1.5 text-sm bg-gray-50 dark:bg-[#27272a]/50 border border-gray-200 dark:border-[#3f3f46] text-[#111827] dark:text-white rounded-md focus:outline-none focus:ring-1 focus:ring-[#0f8246] transition-all"
                                         />
                                     </div>
                                     <select
                                         value={filterStatus}
                                         onChange={e => setFilterStatus(e.target.value as typeof filterStatus)}
-                                        className="flex items-center space-x-1 px-3 py-1.5 text-sm text-[#4b5563] dark:text-[#a1a1aa] bg-gray-50 dark:bg-[#27272a]/50 border border-gray-200 dark:border-[#3f3f46] rounded-md hover:bg-gray-100 dark:hover:bg-[#3f3f46] transition-colors outline-none focus:ring-1 focus:ring-[#0f8246]"
+                                        className="flex-1 sm:flex-none items-center space-x-1 px-3 py-1.5 text-sm text-[#4b5563] dark:text-[#a1a1aa] bg-gray-50 dark:bg-[#27272a]/50 border border-gray-200 dark:border-[#3f3f46] rounded-md hover:bg-gray-100 dark:hover:bg-[#3f3f46] transition-colors outline-none focus:ring-1 focus:ring-[#0f8246]"
                                     >
                                         <option value="all">All Status</option>
                                         <option value="safe">Clean Only</option>

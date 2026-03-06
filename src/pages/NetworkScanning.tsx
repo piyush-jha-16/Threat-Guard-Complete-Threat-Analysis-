@@ -148,10 +148,10 @@ const NetworkScanning: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Scan Area */}
                     <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] rounded-[14px] p-8 shadow-sm transition-colors duration-200">
+                        <div className="bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] rounded-[14px] p-4 sm:p-8 shadow-sm transition-colors duration-200">
 
                             {!isScanning && !scanComplete && (
-                                <div className={`border-2 border-dashed rounded-xl py-16 px-6 flex flex-col items-center justify-center relative transition-all duration-200 min-h-[360px] border-gray-300 dark:border-[#3f3f46] bg-gray-50 dark:bg-[#18181b]/50 hover:bg-gray-100 dark:hover:bg-[#27272a]/30`}>
+                                <div className={`border-2 border-dashed rounded-xl py-12 sm:py-16 px-6 flex flex-col items-center justify-center relative transition-all duration-200 min-h-[320px] border-gray-300 dark:border-[#3f3f46] bg-gray-50 dark:bg-[#18181b]/50 hover:bg-gray-100 dark:hover:bg-[#27272a]/30`}>
                                     <div className="flex flex-col items-center justify-center space-y-6 z-10 w-full max-w-lg text-center">
                                         {/* Icon Circle */}
                                         <div className={`w-20 h-20 rounded-full flex items-center justify-center border transition-all duration-300 shadow-sm bg-white dark:bg-[#1e1e24] border-gray-200 dark:border-[#27272a]`}>
@@ -215,7 +215,7 @@ const NetworkScanning: React.FC = () => {
 
                             {scanComplete && !isScanning && (
                                 <div className="flex flex-col min-h-[360px] w-full space-y-6">
-                                    <div className="flex items-center justify-between border-b border-gray-100 dark:border-[#27272a] pb-4">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-gray-100 dark:border-[#27272a] pb-4">
                                         <div>
                                             <h3 className="text-[#111827] dark:text-white font-semibold text-lg flex items-center">
                                                 <CheckCircle2 size={20} className="text-[#0f8246] mr-2" />
@@ -223,7 +223,7 @@ const NetworkScanning: React.FC = () => {
                                             </h3>
                                             <p className="text-[#6b7280] dark:text-[#a1a1aa] text-sm mt-1">Host is active. {discoveredPorts.length} open/filtered ports discovered.</p>
                                         </div>
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-2 flex-wrap">
                                             <button
                                                 onClick={handleDownloadReport}
                                                 className="flex items-center bg-[#0f8246] hover:bg-[#0c6a39] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"

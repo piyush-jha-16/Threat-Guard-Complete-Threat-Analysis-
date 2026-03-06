@@ -159,7 +159,7 @@ const DocumentScanning: React.FC = () => {
             <div className="animation-fade-in space-y-6">
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
                     <div>
                         <h1 className="text-2xl font-bold text-[#111827] dark:text-white tracking-tight">Document Scanning Engine</h1>
                         <p className="text-[#6b7280] dark:text-[#a1a1aa] text-sm mt-1">
@@ -167,7 +167,7 @@ const DocumentScanning: React.FC = () => {
                         </p>
                     </div>
                     {/* Backend Status Badge */}
-                    <div className={`flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full border ${
+                    <div className={`flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full border self-start sm:self-center flex-shrink-0 ${
                         backendOnline === null
                             ? 'bg-gray-100 dark:bg-[#27272a] text-gray-500 dark:text-[#a1a1aa] border-gray-200 dark:border-[#3f3f46]'
                             : backendOnline
@@ -386,14 +386,14 @@ const DocumentScanning: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Dropzone Area */}
                     <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] rounded-[14px] p-8 shadow-sm transition-colors duration-200">
+                        <div className="bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] rounded-[14px] p-4 sm:p-8 shadow-sm transition-colors duration-200">
 
                             {/* Drag & Drop Zone */}
                             <div
                                 onDragOver={handleDragOver}
                                 onDragLeave={handleDragLeave}
                                 onDrop={handleDrop}
-                                className={`border-2 border-dashed rounded-xl p-12 flex flex-col items-center justify-center gap-6 relative overflow-hidden transition-all duration-200 min-h-[320px] 
+                                className={`border-2 border-dashed rounded-xl p-8 sm:p-12 flex flex-col items-center justify-center gap-6 relative overflow-hidden transition-all duration-200 min-h-[280px] sm:min-h-[320px] 
                                     ${isDragging
                                         ? 'border-[#0f8246] bg-[#0f8246]/5 dark:bg-[#0f8246]/10'
                                         : 'border-gray-300 dark:border-[#3f3f46] bg-gray-50 dark:bg-[#18181b]/50 hover:bg-gray-100 dark:hover:bg-[#27272a]/30'}`}

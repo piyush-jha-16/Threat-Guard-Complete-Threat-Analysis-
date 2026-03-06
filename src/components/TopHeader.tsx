@@ -1,10 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Search, Settings, LogOut } from 'lucide-react';
+import { Search, Settings, LogOut, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 import { supabase } from '../lib/supabase';
 
-const TopHeader: React.FC = () => {
+interface TopHeaderProps {
+    onMenuToggle?: () => void;
+}
+
+const TopHeader: React.FC<TopHeaderProps> = ({ onMenuToggle }) => {
     const [userName, setUserName] = useState<string>('Alex');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -41,7 +45,16 @@ const TopHeader: React.FC = () => {
     };
 
     return (
-        <header className="h-full px-6 flex items-center justify-between bg-white dark:bg-[#121212] text-[#111827] dark:text-white transition-colors duration-200">
+        <header className="h-full px-4 sm:px-6 flex items-center justify-between bg-white dark:bg-[#121212] text-[#111827] dark:text-white transition-colors duration-200 gap-3">
+            {/* Hamburger — mobile/tablet only */}
+            <button
+                onClick={onMenuToggle}
+                className="lg:hidden flex-shrink-0 p-2 rounded-lg text-gray-500 dark:text-[#94a3b8] hover:bg-gray-100 dark:hover:bg-[#1E1E1E] transition-colors"
+                aria-label="Open sidebar"
+            >
+                <Menu size={20} />
+            </button>
+
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl relative flex items-center">
                 <Search size={16} className="absolute left-3 text-gray-400 dark:text-[#6b7280] pointer-events-none" />
@@ -54,10 +67,10 @@ const TopHeader: React.FC = () => {
             </div>
 
             {/* Right Actions */}
-            <div className="flex items-center space-x-3 sm:space-x-5">
+            <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
                 <ThemeToggle />
 
-                <div className="h-5 w-[1px] bg-gray-200 dark:bg-[#1E1E1E]"></div>
+                <div className="h-5 w-[1px] bg-gray-200 dark:bg-[#1E1E1E] hidden sm:block"></div>
 
                 <div className="relative" ref={dropdownRef}>
                     <div

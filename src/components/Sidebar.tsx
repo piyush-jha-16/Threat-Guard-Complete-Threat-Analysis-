@@ -9,12 +9,17 @@ import {
     Globe2,
     Activity,
     AppWindow,
-    Network
+    Network,
+    X
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+    onClose?: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -30,15 +35,26 @@ const Sidebar: React.FC = () => {
     return (
         <aside className="h-full flex flex-col bg-white dark:bg-[#121212] text-gray-500 dark:text-[#94a3b8] transition-colors duration-200">
             {/* Logo Area */}
-            <div className="flex items-center space-x-2.5 px-6 h-[64px] mb-4 text-[#0a2e1d] dark:text-[#e2e8f0]">
-                <Shield size={22} strokeWidth={2.5} className="text-[#103b26] drop-shadow-sm dark:text-white" style={{ fill: '#d4ebd9' }} />
-                <span className="text-[16px] font-semibold tracking-wide text-[#111827] dark:text-white">Threat Guard</span>
+            <div className="flex items-center justify-between px-6 h-[64px] mb-4 text-[#0a2e1d] dark:text-[#e2e8f0]">
+                <div className="flex items-center space-x-2.5">
+                    <Shield size={22} strokeWidth={2.5} className="text-[#103b26] drop-shadow-sm dark:text-white" style={{ fill: '#d4ebd9' }} />
+                    <span className="text-[16px] font-semibold tracking-wide text-[#111827] dark:text-white">Threat Guard</span>
+                </div>
+                {/* Close button — only visible on mobile/tablet */}
+                <button
+                    onClick={onClose}
+                    className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#1E1E1E] transition-colors"
+                    aria-label="Close sidebar"
+                >
+                    <X size={18} />
+                </button>
             </div>
 
             {/* Navigation Links */}
             <nav className="flex-1 px-3 space-y-1">
                 <NavLink
                     to="/dashboard"
+                    onClick={onClose}
                     className={({ isActive }) =>
                         `flex items-center px-3 py-2.5 rounded-lg transition-colors group ${isActive
                             ? 'bg-gray-100 dark:bg-[#1E1E1E] text-[#111827] dark:text-white font-medium'
@@ -52,6 +68,7 @@ const Sidebar: React.FC = () => {
 
                 <NavLink
                     to="/document-scanning"
+                    onClick={onClose}
                     className={({ isActive }) =>
                         `flex items-center px-3 py-2.5 rounded-lg transition-colors group ${isActive
                             ? 'bg-gray-100 dark:bg-[#1E1E1E] text-[#111827] dark:text-white font-medium'
@@ -65,6 +82,7 @@ const Sidebar: React.FC = () => {
 
                 <NavLink
                     to="/weblinks"
+                    onClick={onClose}
                     className={({ isActive }) =>
                         `flex items-center px-3 py-2.5 rounded-lg transition-colors group ${isActive
                             ? 'bg-gray-100 dark:bg-[#1E1E1E] text-[#111827] dark:text-white font-medium'
@@ -78,6 +96,7 @@ const Sidebar: React.FC = () => {
 
                 <NavLink
                     to="/executables"
+                    onClick={onClose}
                     className={({ isActive }) =>
                         `flex items-center px-3 py-2.5 rounded-lg transition-colors group ${isActive
                             ? 'bg-gray-100 dark:bg-[#1E1E1E] text-[#111827] dark:text-white font-medium'
@@ -91,6 +110,7 @@ const Sidebar: React.FC = () => {
 
                 <NavLink
                     to="/applications"
+                    onClick={onClose}
                     className={({ isActive }) =>
                         `flex items-center px-3 py-2.5 rounded-lg transition-colors group ${isActive
                             ? 'bg-gray-100 dark:bg-[#1E1E1E] text-[#111827] dark:text-white font-medium'
@@ -104,6 +124,7 @@ const Sidebar: React.FC = () => {
 
                 <NavLink
                     to="/network-scanning"
+                    onClick={onClose}
                     className={({ isActive }) =>
                         `flex items-center px-3 py-2.5 rounded-lg transition-colors group ${isActive
                             ? 'bg-gray-100 dark:bg-[#1E1E1E] text-[#111827] dark:text-white font-medium'
@@ -117,6 +138,7 @@ const Sidebar: React.FC = () => {
 
                 <NavLink
                     to="/reports"
+                    onClick={onClose}
                     className={({ isActive }) =>
                         `flex items-center px-3 py-2.5 rounded-lg transition-colors group ${isActive
                             ? 'bg-gray-100 dark:bg-[#1E1E1E] text-[#111827] dark:text-white font-medium'
@@ -133,6 +155,7 @@ const Sidebar: React.FC = () => {
             <div className="p-3 mt-auto border-t border-gray-200 dark:border-[#1E1E1E] space-y-1">
                 <NavLink
                     to="/settings"
+                    onClick={onClose}
                     className={({ isActive }) =>
                         `flex items-center px-3 py-2.5 rounded-lg transition-colors group ${isActive
                             ? 'bg-gray-100 dark:bg-[#1E1E1E] text-[#111827] dark:text-white font-medium'
