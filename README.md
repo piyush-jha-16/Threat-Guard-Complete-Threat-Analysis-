@@ -1,15 +1,20 @@
-# Threat Guard � Intelligent Threat Detection Platform
+# Threat Guard - Intelligent Threat Detection Platform
+
+<div align="center">
 
 ![ThreatGuard](https://img.shields.io/badge/ThreatGuard-Professional-0f8246?style=for-the-badge&logo=shield&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
 **Master cybersecurity through real-time detection, deep scanning, and actionable threat intelligence.**
 
-ThreatGuard Professional is a full-stack security platform designed for cybersecurity professionals and power users. It delivers deep file inspection, live URL analysis, network reconnaissance, and application monitoring � all through a sleek, modern interface with dark mode support, PDF reporting, and role-based user management.
+[Live Website](https://threat-guard-complete-threat-analys.vercel.app/)
+[ ](#)
+[ ](#)
+[ ](#)
+[Report Bug](https://github.com/piyush-jha-16/Threat-Guard-Complete-Threat-Analysis-/issues)
+</div>
+
+ThreatGuard Professional is a full-stack security platform designed for cybersecurity professionals and power users. It delivers deep file inspection, live URL analysis, network reconnaissance, and application monitoring all through a sleek, modern interface with dark mode support, PDF reporting, and role-based user management.
 
 ---
 
@@ -17,8 +22,8 @@ ThreatGuard Professional is a full-stack security platform designed for cybersec
 
 ThreatGuard Professional is built on two pillars:
 
-- **Vulnerable Mode** � Actively scan, probe, and analyse real threats across documents, URLs, executables, and networks
-- **Secure Mode** � Understand exactly how each threat is detected and what defensive actions are taken
+- **Vulnerable Mode** : Actively scan, probe, and analyse real threats across documents, URLs, executables, and networks
+- **Secure Mode** : Understand exactly how each threat is detected and what defensive actions are taken
 
 Each engine operates independently and logs results to a unified scan history, enabling cross-engine intelligence reporting.
 
@@ -28,11 +33,11 @@ Each engine operates independently and logs results to a unified scan history, e
 
 ###  Interactive Dashboard
 A fully responsive command centre that puts your security posture at a glance:
-- **Live stat cards** � Total scans, critical problems, and threats detected, updated in real time
-- **URL Scan Engine widget** � Instantly scan suspicious links directly from the dashboard
-- **Recent Analysis panel** � Top YARA rules triggered across all scan types
-- **Scan Activity Table** � Timestamped log of every scan with file name, type, detection rule, severity badge, and action taken
-- **Live clock** � Displays current date and time in your configured timezone
+- **Live stat cards** : Total scans, critical problems, and threats detected, updated in real time
+- **URL Scan Engine widget** : Instantly scan suspicious links directly from the dashboard
+- **Recent Analysis panel** : Top YARA rules triggered across all scan types
+- **Scan Activity Table** : Timestamped log of every scan with file name, type, detection rule, severity badge, and action taken
+- **Live clock** : Displays current date and time in your configured timezone
 
 ---
 
@@ -42,7 +47,7 @@ Deep-scan documents for embedded threats using the YARA pattern-matching engine:
 - Supports PDF, DOCX, XLSX, and more
 - Detects **embedded macros**, **malicious links**, **ransomware signatures**, **phishing payloads**, and packed shellcode
 - Returns a full breakdown: detected indicators, triggered YARA rules, file size, scan time
-- Colour-coded **status banner** � Safe (green), Warning (amber), Malicious (red)
+- Colour-coded **status banner** : Safe (green), Warning (amber), Malicious (red)
 - **PDF report download** per scan with all findings, file metadata, and engine details
 - Backend health indicator shows live engine status (Online / Offline)
 
@@ -51,13 +56,13 @@ Deep-scan documents for embedded threats using the YARA pattern-matching engine:
 ###  Web Analysis Engine (Weblinks)
 Comprehensive URL threat intelligence in a single scan:
 - Input any URL and receive a full multi-stage analysis:
-  - **Domain & DNS resolution** � A, MX, NS, TXT records
-  - **SSL/TLS certificate validation** � Issuer, subject, expiry, TLS version
-  - **Redirect chain tracing** � Follows every HTTP hop to the final destination
-  - **Threat pattern analysis** � Homograph attacks, phishing indicators, brand abuse, typosquatting
-- **Safety score ring** (0�100) with colour coding per threat level
+  - **Domain & DNS resolution** : A, MX, NS, TXT records
+  - **SSL/TLS certificate validation** : Issuer, subject, expiry, TLS version
+  - **Redirect chain tracing** : Follows every HTTP hop to the final destination
+  - **Threat pattern analysis** : Homograph attacks, phishing indicators, brand abuse, typosquatting
+- **Safety score ring** (0:100) with colour coding per threat level
 - Expandable **threat cards** per detected indicator with severity labels (CRITICAL / HIGH / MEDIUM / LOW)
-- **WHOIS domain information** � Registrar, registration date, expiry, country
+- **WHOIS domain information** : Registrar, registration date, expiry, country
 - Animated step-by-step scan progress UI
 
 ---
@@ -66,9 +71,9 @@ Comprehensive URL threat intelligence in a single scan:
 Detonate binary payloads in a safe, isolated analysis environment:
 - Upload `.exe`, `.msi`, `.sh`, `.bat`, `.bin` files up to 100 MB
 - Monitors and reports:
-  - **Static reverse engineering** � Decompiles functions, extracts packed strings
-  - **API hook monitoring** � Logs suspicious Windows API and POSIX system calls
-  - **Memory injection detection** � Identifies process hollowing and unauthorised allocations
+  - **Static reverse engineering** : Decompiles functions, extracts packed strings
+  - **API hook monitoring** : Logs suspicious Windows API and POSIX system calls
+  - **Memory injection detection** : Identifies process hollowing and unauthorised allocations
 - Real-time telemetry panel shows each analysis stage as it progresses
 
 ---
@@ -98,22 +103,22 @@ Real-time port scanning and host intelligence:
 
 ###  Intelligence Reports
 Centralised report management across all scan engines:
-- **Scan History Log** � Filterable and searchable list of every scan across all engines
+- **Scan History Log** : Filterable and searchable list of every scan across all engines
   - Filter by status: All / Clean / Warning / Malicious
   - Search by file name, scan type, or triggered rule
   - Download a **PDF report** for any individual scan
-- **Master Report Generation** � Compile all historical scans into a single executive summary PDF
-- **30-Day Summary panel** � Clean scans, suspicious flags, and malicious detections at a glance
+- **Master Report Generation** : Compile all historical scans into a single executive summary PDF
+- **30-Day Summary panel** : Clean scans, suspicious flags, and malicious detections at a glance
 - One-click **Clear History** with confirmation guard
 
 ---
 
 ###  Platform Settings
 Full account and preference management:
-- **Profile Overview** � Edit display name; email shown as read-only with security notice
-- **Security & Auth** � Change password (minimum 6 characters, with confirmation); log out all active sessions
-- **Notifications** � Toggle email threat alerts, push notifications, and weekly summary reports
-- **Preferences** � Set display language and timezone with a live clock preview showing the selected zone
+- **Profile Overview** : Edit display name; email shown as read-only with security notice
+- **Security & Auth** : Change password (minimum 6 characters, with confirmation); log out all active sessions
+- **Notifications** : Toggle email threat alerts, push notifications, and weekly summary reports
+- **Preferences** : Set display language and timezone with a live clock preview showing the selected zone
 
 ---
 
@@ -128,7 +133,7 @@ Secure multi-user authentication powered by Supabase:
 
 ###  Dark Mode & Responsive Design
 - Full **light/dark mode** toggle available on every page including the auth screen
-- Completely **mobile and tablet responsive** � sidebar collapses to a slide-in drawer on small screens with a hamburger toggle
+- Completely **mobile and tablet responsive** : sidebar collapses to a slide-in drawer on small screens with a hamburger toggle
 - Scan activity table switches to a **card layout** on mobile for readability
 - All page headers, toolbars, and grids adapt fluidly across breakpoints (mobile  tablet  desktop)
 
@@ -136,8 +141,8 @@ Secure multi-user authentication powered by Supabase:
 
 ###  PDF Report Engine
 Every scan type supports downloadable PDF reports:
-- **Single-scan reports** � Document, URL, Network, and Executable scans each export a dedicated report
-- **Master report** � Exports the full scan history with a 30-day summary and all detected threats
+- **Single-scan reports** : Document, URL, Network, and Executable scans each export a dedicated report
+- **Master report** : Exports the full scan history with a 30-day summary and all detected threats
 - Reports include: scan type, file/target name, timestamp, status, detected indicators, and triggered rules
 
 ---
@@ -242,7 +247,7 @@ docker run -p 8000:8000 threat-guard-backend
 ```
 threat-guard-professional/
  backend/
-    main.py               # FastAPI app � document & URL scanning
+    main.py               # FastAPI app : document & URL scanning
     network_scanner.py    # Network port scan logic
     document_rules.yar    # YARA ruleset for document analysis
     requirements.txt
@@ -278,11 +283,11 @@ threat-guard-professional/
 2. Create an account or log in via the **Sign Up / Login** screen
 3. Use the **Dashboard** for a quick URL scan or to review recent activity
 4. Navigate to any scan engine from the sidebar:
-   - **Document Scanning** � Upload a file and receive a full YARA-based threat report
-   - **Weblinks** � Enter a URL for SSL, DNS, redirect, and threat analysis
-   - **Executables** � Submit a binary for sandbox detonation analysis
-   - **Applications** � Run a full system audit of installed software
-   - **Network Scanning** � Probe any IP or subnet for open ports and vulnerabilities
+   - **Document Scanning** : Upload a file and receive a full YARA-based threat report
+   - **Weblinks** : Enter a URL for SSL, DNS, redirect, and threat analysis
+   - **Executables** : Submit a binary for sandbox detonation analysis
+   - **Applications** : Run a full system audit of installed software
+   - **Network Scanning** : Probe any IP or subnet for open ports and vulnerabilities
 5. Visit **Reports** to browse history, filter by status, and download PDF summaries
 6. Configure your profile, password, timezone, and notifications in **Settings**
 
@@ -300,4 +305,4 @@ npm run lint
 
 ## License
 
-This project is licensed under the **MIT License** � see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** : see the [LICENSE](LICENSE) file for details.
