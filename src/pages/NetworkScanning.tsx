@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { Network, CheckCircle2, ShieldAlert, Wifi, Server, Route, ShieldCheck, Loader2, Download } from 'lucide-react';
 import { downloadSingleScanPDF, type SingleScanInput } from '../lib/pdfReport';
+import { addScan } from '../lib/scanStore';
 
 interface PortDetails {
     port: number;
@@ -67,6 +68,38 @@ const NetworkScanning: React.FC = () => {
             });
             setDiscoveredPorts(data.discoveredPorts);
             setScanComplete(true);
+
+            // Record in scan history
+            const hasWarnings = data.discoveredPorts?.some((p: any) => p.warning) || false;
+            let status: 'safe' | 'warning' | 'malicious' = 'safe';
+            let severity: 'clean' | 'low' | 'medium' | 'high' | 'critical' = 'clean';
+            let actionText = 'Allowed';
+
+            if (hasWarnings) {
+                status = 'warning';
+                severity = 'medium';
+                actionText = 'Flagged';
+            }
+            if (data.discoveredPorts?.some((p: any) => p.warning && p.warning.includes('High Risk'))) {
+                status = 'malicious';
+                severity = 'high';
+                actionText = 'Blocked';
+            }
+
+            const threats = data.discoveredPorts
+                ?.filter((p: any) => p.warning)
+                .map((p: any) => `[Port ${p.port}] ${p.warning}`) || [];
+
+            addScan({
+                fileName: data.targetIp || targetIp,
+                type: 'Network',
+                status: status,
+                severity: severity,
+                threatsFound: threats,
+                rulesTriggered: [],
+                message: `Network scan completed for ${data.targetIp || targetIp}. Found ${data.discoveredPorts?.length || 0} open/filtered ports.`,
+                action: actionText
+            });
         } catch (error: any) {
             setInputError(error.message || "An unexpected error occurred during the scan.");
             setScanComplete(false);

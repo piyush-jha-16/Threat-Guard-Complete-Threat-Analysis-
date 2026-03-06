@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { UploadCloud, FileText, CheckCircle2, ShieldAlert, Loader2, AlertCircle, AlertTriangle, WifiOff, Server, Download } from 'lucide-react';
 import { downloadSingleScanPDF } from '../lib/pdfReport';
+import { addScan, resolveSeverity } from '../lib/scanStore';
 
 type ScanStatus = 'safe' | 'warning' | 'malicious';
 
@@ -106,6 +107,24 @@ const DocumentScanning: React.FC = () => {
                 message: data.message,
                 fileName: data.fileName || selectedFile.name,
                 fileSize: data.fileSize,
+            });
+
+            // Record in scan history
+            const severity = resolveSeverity(data.status, data.threatsFound || []);
+            let actionText = 'Allowed';
+            if (severity === 'critical' || severity === 'high') actionText = 'Blocked';
+            else if (data.threatsFound?.length > 0) actionText = 'Flagged';
+
+            addScan({
+                fileName: data.fileName || selectedFile.name,
+                type: 'Document',
+                status: data.status,
+                severity: severity,
+                threatsFound: data.threatsFound || [],
+                rulesTriggered: data.rulesTriggered || [],
+                message: data.message,
+                fileSize: data.fileSize,
+                action: actionText
             });
 
         } catch (error: unknown) {
