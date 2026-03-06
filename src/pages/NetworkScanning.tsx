@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
-import { Network, CheckCircle2, ShieldAlert, Wifi, Server, Route, ShieldCheck, Loader2 } from 'lucide-react';
+import { Network, CheckCircle2, ShieldAlert, Wifi, Server, Route, ShieldCheck, Loader2, Download } from 'lucide-react';
+import { downloadSingleScanPDF, type SingleScanInput } from '../lib/pdfReport';
 
 interface PortDetails {
     port: number;
@@ -10,45 +11,91 @@ interface PortDetails {
     warning?: string;
 }
 
+interface HostDetails {
+    hostname?: string;
+    location?: string;
+    isp?: string;
+}
+
 const NetworkScanning: React.FC = () => {
     const [isScanning, setIsScanning] = useState(false);
     const [scanComplete, setScanComplete] = useState(false);
     const [targetIp, setTargetIp] = useState('');
     const [discoveredPorts, setDiscoveredPorts] = useState<PortDetails[]>([]);
+    const [hostDetails, setHostDetails] = useState<HostDetails | null>(null);
     const [inputError, setInputError] = useState<string | null>(null);
 
     const isValidIpOrSubnet = (ip: string) => {
-        // Matches standard IPv4 and IPv4 with subnet (e.g., 192.168.1.1 or 10.0.0.0/24)
-        const regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\/(?:[1-2]?[0-9]|3[0-2]))?$/;
-        return regex.test(ip.trim());
+        // Simple validation, allow domains as well since backend resolves them
+        return ip.trim().length > 0;
     };
 
-    const startScan = (e?: React.FormEvent) => {
+    const startScan = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
         setInputError(null);
 
         if (!targetIp.trim()) return;
 
         if (!isValidIpOrSubnet(targetIp)) {
-            setInputError("Please enter a valid IPv4 address or subnet (e.g., 192.168.1.1 or 10.0.0.0/24).");
+            setInputError("Please enter a valid IP address or hostname.");
             return;
         }
 
         setIsScanning(true);
         setScanComplete(false);
         setDiscoveredPorts([]);
+        setHostDetails(null);
 
-        setTimeout(() => {
-            setDiscoveredPorts([
-                { port: 80, protocol: 'tcp', service: 'http', state: 'open' },
-                { port: 443, protocol: 'tcp', service: 'https', state: 'open' },
-                { port: 22, protocol: 'tcp', service: 'ssh', state: 'open', warning: 'Weak Cypher Detected' },
-                { port: 3389, protocol: 'tcp', service: 'ms-wbt-server', state: 'filtered' },
-                { port: 3306, protocol: 'tcp', service: 'mysql', state: 'open', warning: 'Exposed Database' }
-            ]);
-            setIsScanning(false);
+        try {
+            const response = await fetch('http://localhost:8000/scan-network', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ target: targetIp.trim() })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to scan target.');
+            }
+
+            const data = await response.json();
+            setTargetIp(data.targetIp); // set to resolved IP
+            setHostDetails({
+                hostname: data.hostname,
+                location: data.location,
+                isp: data.isp
+            });
+            setDiscoveredPorts(data.discoveredPorts);
             setScanComplete(true);
-        }, 2000);
+        } catch (error: any) {
+            setInputError(error.message || "An unexpected error occurred during the scan.");
+            setScanComplete(false);
+        } finally {
+            setIsScanning(false);
+        }
+    };
+
+    const handleDownloadReport = () => {
+        const hasWarnings = discoveredPorts.some(p => p.warning);
+
+        let status: 'safe' | 'warning' | 'malicious' = 'safe';
+        if (hasWarnings) status = 'warning';
+        if (discoveredPorts.some(p => p.warning && p.warning.includes('High Risk'))) status = 'malicious';
+
+        const threats = discoveredPorts
+            .filter(p => p.warning)
+            .map(p => `[Port ${p.port}] ${p.warning}`);
+
+        const scanInput: SingleScanInput = {
+            status,
+            threatsFound: threats,
+            rulesTriggered: [],
+            message: `Network scan completed for ${targetIp}. ${hostDetails?.hostname ? `Hostname: ${hostDetails.hostname}. ` : ''}Found ${discoveredPorts.length} open/filtered ports.`,
+            fileName: targetIp,
+            scanType: 'Network Port Scan'
+        };
+
+        downloadSingleScanPDF(scanInput);
     };
 
     return (
@@ -143,17 +190,44 @@ const NetworkScanning: React.FC = () => {
                                             </h3>
                                             <p className="text-[#6b7280] dark:text-[#a1a1aa] text-sm mt-1">Host is active. {discoveredPorts.length} open/filtered ports discovered.</p>
                                         </div>
-                                        <button
-                                            onClick={() => {
-                                                setScanComplete(false);
-                                                setTargetIp('');
-                                                setDiscoveredPorts([]);
-                                            }}
-                                            className="bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#3f3f46] text-[#111827] dark:text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#27272a] transition-colors shadow-sm"
-                                        >
-                                            New Scan
-                                        </button>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={handleDownloadReport}
+                                                className="flex items-center bg-[#0f8246] hover:bg-[#0c6a39] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                                            >
+                                                <Download size={16} className="mr-2" />
+                                                Download Report
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setScanComplete(false);
+                                                    setTargetIp('');
+                                                    setDiscoveredPorts([]);
+                                                    setHostDetails(null);
+                                                }}
+                                                className="bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#3f3f46] text-[#111827] dark:text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#27272a] transition-colors shadow-sm"
+                                            >
+                                                New Scan
+                                            </button>
+                                        </div>
                                     </div>
+
+                                    {hostDetails && (
+                                        <div className="bg-gray-50 dark:bg-[#18181b]/50 border border-gray-200 dark:border-[#3f3f46] rounded-xl p-4 flex flex-col sm:flex-row gap-4 justify-between">
+                                            <div>
+                                                <p className="text-xs text-gray-500 dark:text-[#a1a1aa] uppercase tracking-wider font-semibold mb-1">Hostname</p>
+                                                <p className="text-[#111827] dark:text-white font-medium text-sm">{hostDetails.hostname || 'Unknown'}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-gray-500 dark:text-[#a1a1aa] uppercase tracking-wider font-semibold mb-1">Location</p>
+                                                <p className="text-[#111827] dark:text-white font-medium text-sm">{hostDetails.location || 'Unknown'}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-gray-500 dark:text-[#a1a1aa] uppercase tracking-wider font-semibold mb-1">ISP</p>
+                                                <p className="text-[#111827] dark:text-white font-medium text-sm">{hostDetails.isp || 'Unknown'}</p>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     <div className="grid grid-cols-1 gap-3">
                                         {discoveredPorts.map((p, i) => (
