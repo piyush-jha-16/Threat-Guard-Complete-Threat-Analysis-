@@ -11,7 +11,6 @@ import {
     getStats,
     getHistory,
     addScan,
-    resolveSeverity,
     actionFromStatus,
     severityLabel,
     type ScanRecord,
