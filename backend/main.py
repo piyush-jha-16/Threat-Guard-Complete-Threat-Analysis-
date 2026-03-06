@@ -561,6 +561,17 @@ def scan_url(request: URLScanRequest):
         "scanned_at": datetime.now(timezone.utc).isoformat(),
     }
 
+@app.route("/")
+def home():
+    return {"status": "Threat Guard API running"}
+
+@app.route("/health")
+def health():
+    return {"status": "ok"}
+
+@app.route("/ping")
+def ping():
+    return "pong"
 
 if __name__ == "__main__":
     import uvicorn

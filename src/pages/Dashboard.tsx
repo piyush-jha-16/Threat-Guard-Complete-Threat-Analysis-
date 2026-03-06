@@ -152,19 +152,7 @@ const Dashboard: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 w-full">
                     <StatCard title="Total Scans" value={stats.total.toLocaleString()} />
                     <StatCard title="Critical Problems" value={stats.critical.toLocaleString()} />
-                    <StatCard
-                        title="System Health"
-                        value={stats.critical > 0 ? 'Warning' : 'Optimal'}
-                        icon={
-                            <button
-                                onClick={() => handleSimulateScan('Network', 'Network Sweep')}
-                                disabled={isScanning}
-                                className="text-[12px] px-3 py-1 bg-[#0f8246] hover:bg-[#0f8246]/90 text-white rounded-md transition-colors disabled:opacity-50 font-medium whitespace-nowrap"
-                            >
-                                Network Scan
-                            </button>
-                        }
-                    />
+                    <StatCard title="Threats Detected" value={stats.threats.toLocaleString()} />
                 </div>
 
                 {/* Middle Section */}

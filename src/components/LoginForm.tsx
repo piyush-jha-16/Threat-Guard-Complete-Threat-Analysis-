@@ -59,7 +59,7 @@ const LoginForm: React.FC = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="block w-full pl-[38px] pr-3 py-[10px] border border-gray-200 dark:border-[#3f3f46] rounded-lg bg-white dark:bg-[#27272a]/50 text-[#111827] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0f8246]/20 focus:border-[#0f8246] transition-colors text-[14px] placeholder:text-[#9ca3af]"
-                        placeholder="john@example.com"
+                        placeholder="piyush@example.com"
                     />
                 </div>
             </div>
