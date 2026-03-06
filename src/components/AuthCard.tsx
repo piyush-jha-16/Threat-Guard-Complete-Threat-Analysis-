@@ -18,9 +18,6 @@ const AuthCard: React.FC = () => {
                         <Shield size={26} strokeWidth={2.5} className="text-[#103b26] drop-shadow-sm" style={{ fill: '#d4ebd9' }} />
                         <span className="text-[20px] font-bold tracking-tight text-[#111827] dark:text-white leading-none">Threat Guard</span>
                     </div>
-                    <h2 className="text-[24px] font-[600] text-[#111827] dark:text-white tracking-tight">
-                        Secure Access
-                    </h2>
                 </div>
 
                 <div className="flex w-full border-b border-gray-100 dark:border-[#27272a] mb-7 pt-1 relative">
