@@ -1,22 +1,80 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import StatCard from '../components/dashboard/StatCard';
 import UrlScanEngine from '../components/dashboard/UrlScanEngine';
 import TopDetectionRules, { type TopDetectionRule } from '../components/dashboard/TopDetectionRules';
 import ScanActivityTable, { type ScanActivity } from '../components/dashboard/ScanActivityTable';
-import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Clock } from 'lucide-react';
+import {
+    subscribe,
+    getStats,
+    getHistory,
+    addScan,
+    resolveSeverity,
+    actionFromStatus,
+    severityLabel,
+    type ScanRecord,
+} from '../lib/scanStore';
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const severityToLabel = (s: ScanRecord['severity']): string => {
+    const map: Record<string, string> = {
+        clean: 'Clean — Green',
+        low: 'Low Risk — Green',
+        medium: 'Medium — Amber',
+        high: 'High — Orange',
+        critical: 'Critical — Red',
+    };
+    return map[s] ?? s;
+};
+
+const recordToActivity = (r: ScanRecord): ScanActivity => ({
+    name: r.fileName,
+    type: r.type,
+    rule: r.rulesTriggered.length > 0 ? r.rulesTriggered[0] : (r.status === 'safe' ? 'Clean Scan' : 'Heuristic Pattern Match'),
+    severityLabel: severityToLabel(r.severity),
+    severityLevel: r.severity === 'clean' ? 'low' : r.severity as ScanActivity['severityLevel'],
+    timestamp: new Date(r.timestamp).toLocaleString(),
+    action: r.action,
+    secondaryAction: r.status === 'malicious' ? 'Analyzed' : '',
+});
+
+// ── Component ─────────────────────────────────────────────────────────────────
 const Dashboard: React.FC = () => {
     const [userName, setUserName] = useState<string>('');
-    const [stats, setStats] = useState({ total: 0, critical: 0 });
-    const [activities, setActivities] = useState<ScanActivity[]>([]);
-    const [topRules, setTopRules] = useState<TopDetectionRule[]>([]);
+    const [stats, setStats] = useState(() => getStats());
+    const [activities, setActivities] = useState<ScanActivity[]>(() =>
+        getHistory().slice(0, 50).map(recordToActivity)
+    );
+    const [topRules, setTopRules] = useState<TopDetectionRule[]>(() =>
+        buildTopRules(getHistory())
+    );
     const [isScanning, setIsScanning] = useState(false);
     const [currentTime, setCurrentTime] = useState(new Date());
 
+    // Build top-5 most frequent triggered rules
+    function buildTopRules(history: ScanRecord[]): TopDetectionRule[] {
+        const ruleCount = new Map<string, number>();
+        history.forEach(r => r.rulesTriggered.forEach(rule => {
+            ruleCount.set(rule, (ruleCount.get(rule) ?? 0) + 1);
+        }));
+        return Array.from(ruleCount.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([name, count]) => ({ name, alert: `${count} match${count !== 1 ? 'es' : ''}` }));
+    }
+
+    // Refresh dashboard state from store
+    const refresh = useCallback(() => {
+        setStats(getStats());
+        const history = getHistory();
+        setActivities(history.slice(0, 50).map(recordToActivity));
+        setTopRules(buildTopRules(history));
+    }, []);
+
     useEffect(() => {
+        // Fetch username
         const fetchUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
@@ -26,54 +84,39 @@ const Dashboard: React.FC = () => {
         };
         fetchUser();
 
-        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-        return () => clearInterval(timer);
-    }, []);
+        // Subscribe to scan store changes
+        const unsub = subscribe(refresh);
 
+        // Clock ticker
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+
+        return () => {
+            unsub();
+            clearInterval(timer);
+        };
+    }, [refresh]);
+
+    // ── Network Scan (simulated, still writes to store) ─────────────────────
     const handleSimulateScan = (type: string, name: string) => {
         setIsScanning(true);
-        // Simulate a network request or scan process
         setTimeout(() => {
-            const isThreat = Math.random() > 0.7; // 30% chance of threat
-            const isBlocked = isThreat && Math.random() > 0.1; // 90% chance to block if threat
+            const isThreat = Math.random() > 0.7;
+            const severities: ScanRecord['severity'][] = ['low', 'medium', 'high', 'critical'];
+            const severity: ScanRecord['severity'] = isThreat
+                ? severities[Math.floor(Math.random() * 3) + 1]
+                : 'clean';
+            const status: ScanRecord['status'] = isThreat ? 'malicious' : 'safe';
 
-            const severityLevels: ('low' | 'medium' | 'high' | 'critical')[] = ['low', 'medium', 'high', 'critical'];
-            const randomSeverity = isThreat ? severityLevels[Math.floor(Math.random() * 3) + 1] : 'low';
-
-            setStats(prev => ({
-                total: prev.total + 1,
-                critical: prev.critical + (randomSeverity === 'critical' ? 1 : 0),
-            }));
-            const labels = {
-                low: 'Low Risk - Green',
-                medium: 'Medium - Amber',
-                high: 'High - Orange',
-                critical: 'Critical - Red'
-            };
-
-            const now = new Date();
-            const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours() % 12 || 12).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} ${now.getHours() >= 12 ? 'PM' : 'AM'}`;
-
-            const newActivity: ScanActivity = {
-                name: name,
-                type: type,
-                rule: isThreat ? 'Heuristic Pattern Match' : 'Clean Scan',
-                severityLabel: labels[randomSeverity],
-                severityLevel: randomSeverity,
-                timestamp: timestamp,
-                action: isBlocked ? 'Blocked' : (isThreat ? 'Flagged' : 'Allowed'),
-                secondaryAction: isThreat ? 'Analyzed' : ''
-            };
-
-            setActivities(prev => [newActivity, ...prev]);
-
-            if (isThreat) {
-                setTopRules(prev => {
-                    const newRuleName = Math.random() > 0.5 ? 'Malicious Macro Detection' : 'Ransomware Signature Match';
-                    const newRule = { name: newRuleName, alert: 'Just now' };
-                    return [newRule, ...prev].slice(0, 5); // Keep top 5 latest rules
-                });
-            }
+            addScan({
+                fileName: name,
+                type: type as ScanRecord['type'],
+                status,
+                severity,
+                threatsFound: isThreat ? [`[${severityLabel(severity)}] Heuristic pattern match in ${name}`] : [],
+                rulesTriggered: isThreat ? ['Heuristic Pattern Match'] : [],
+                message: isThreat ? `Threat detected in ${name}` : `${name} is clean`,
+                action: actionFromStatus(status, severity),
+            });
 
             setIsScanning(false);
         }, 1500);
@@ -112,7 +155,7 @@ const Dashboard: React.FC = () => {
                     <StatCard title="Critical Problems" value={stats.critical.toLocaleString()} />
                     <StatCard
                         title="System Health"
-                        value={stats.critical > 0 ? "Warning" : "Optimal"}
+                        value={stats.critical > 0 ? 'Warning' : 'Optimal'}
                         icon={
                             <button
                                 onClick={() => handleSimulateScan('Network', 'Network Sweep')}
@@ -125,7 +168,7 @@ const Dashboard: React.FC = () => {
                     />
                 </div>
 
-                {/* Middle Section: Scan New Content & Top Rules */}
+                {/* Middle Section */}
                 <div className="flex flex-col lg:flex-row gap-4 mb-6 items-stretch">
                     <UrlScanEngine onScan={handleSimulateScan} isScanning={isScanning} />
                     <TopDetectionRules rules={topRules} />
