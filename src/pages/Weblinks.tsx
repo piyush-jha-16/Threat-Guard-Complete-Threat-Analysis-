@@ -404,7 +404,7 @@ const Weblinks: React.FC = () => {
 
         try {
             const [apiResult] = await Promise.all([
-                fetch('http://localhost:8000/scan-url', {
+                fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'}/scan-url`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ url: trimmed }),
