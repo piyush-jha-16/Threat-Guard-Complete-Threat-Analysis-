@@ -24,9 +24,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
 
     const handleLogout = async () => {
         try {
+            localStorage.removeItem('tg_authenticated');
+            localStorage.removeItem('tg_session');
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
-            navigate('/');
+            window.location.href = '/';
         } catch (error: any) {
             console.error('Error logging out:', error.message);
         }
