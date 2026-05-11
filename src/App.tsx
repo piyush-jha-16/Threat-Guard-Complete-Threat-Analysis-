@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './lib/supabase';
-import type { Session } from '@supabase/supabase-js';
+import { getMockCurrentUser } from './lib/mockAuth';
 import AuthLayout from './components/AuthLayout';
 import AuthCard from './components/AuthCard';
 import Dashboard from './pages/Dashboard';
@@ -14,24 +14,34 @@ import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 
 function App() {
-  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Get initial session
+    // Check for mock auth session first
+    const mockUser = getMockCurrentUser();
+    const isMockAuthenticated = localStorage.getItem('tg_authenticated') === 'true';
+    
+    if (mockUser || isMockAuthenticated) {
+      setIsAuthenticated(true);
+      setLoading(false);
+      return;
+    }
+
+    // Get initial Supabase session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+      setIsAuthenticated(!!session);
       setLoading(false);
     }).catch((err) => {
-      console.error('Failed to get session:', err);
+      console.warn('Supabase session check (using mock auth):', err.message);
       setLoading(false);
     });
 
-    // Listen for auth changes
+    // Listen for Supabase auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      setIsAuthenticated(!!session);
     });
 
     return () => subscription.unsubscribe();
@@ -48,7 +58,7 @@ function App() {
         <Route
           path="/"
           element={
-            !session ? (
+            !isAuthenticated ? (
               <AuthLayout>
                 <AuthCard />
               </AuthLayout>
@@ -62,7 +72,7 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            session ? (
+            isAuthenticated ? (
               <Dashboard />
             ) : (
               <Navigate to="/" replace />
@@ -72,7 +82,7 @@ function App() {
         <Route
           path="/document-scanning"
           element={
-            session ? (
+            isAuthenticated ? (
               <DocumentScanning />
             ) : (
               <Navigate to="/" replace />
@@ -82,7 +92,7 @@ function App() {
         <Route
           path="/weblinks"
           element={
-            session ? (
+            isAuthenticated ? (
               <Weblinks />
             ) : (
               <Navigate to="/" replace />
@@ -92,7 +102,7 @@ function App() {
         <Route
           path="/executables"
           element={
-            session ? (
+            isAuthenticated ? (
               <Executables />
             ) : (
               <Navigate to="/" replace />
@@ -102,7 +112,7 @@ function App() {
         <Route
           path="/applications"
           element={
-            session ? (
+            isAuthenticated ? (
               <Applications />
             ) : (
               <Navigate to="/" replace />
@@ -112,7 +122,7 @@ function App() {
         <Route
           path="/network-scanning"
           element={
-            session ? (
+            isAuthenticated ? (
               <NetworkScanning />
             ) : (
               <Navigate to="/" replace />
@@ -122,7 +132,7 @@ function App() {
         <Route
           path="/reports"
           element={
-            session ? (
+            isAuthenticated ? (
               <Reports />
             ) : (
               <Navigate to="/" replace />
@@ -132,7 +142,7 @@ function App() {
         <Route
           path="/settings"
           element={
-            session ? (
+            isAuthenticated ? (
               <Settings />
             ) : (
               <Navigate to="/" replace />
