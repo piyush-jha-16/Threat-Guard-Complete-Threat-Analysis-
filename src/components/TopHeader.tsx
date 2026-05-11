@@ -3,6 +3,7 @@ import { Search, Settings, LogOut, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 import { supabase } from '../lib/supabase';
+import { getMockCurrentUser } from '../lib/mockAuth';
 
 interface TopHeaderProps {
     onMenuToggle?: () => void;
@@ -16,6 +17,11 @@ const TopHeader: React.FC<TopHeaderProps> = ({ onMenuToggle }) => {
 
     useEffect(() => {
         const fetchUser = async () => {
+            const mockUser = getMockCurrentUser();
+            if (mockUser) {
+                setUserName(mockUser.name || mockUser.email?.split('@')[0] || 'User');
+                return;
+            }
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
                 const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
@@ -36,9 +42,11 @@ const TopHeader: React.FC<TopHeaderProps> = ({ onMenuToggle }) => {
 
     const handleLogout = async () => {
         try {
+            localStorage.removeItem('tg_authenticated');
+            localStorage.removeItem('tg_session');
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
-            navigate('/');
+            window.location.href = '/';
         } catch (error: any) {
             console.error('Error logging out:', error.message);
         }
