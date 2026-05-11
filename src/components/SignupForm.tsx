@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { KeyRound, User, ShieldCheck } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { mockSignUp } from '../lib/mockAuth';
 
 const SignupForm: React.FC = () => {
     const [name, setName] = useState('');
@@ -10,6 +11,7 @@ const SignupForm: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [useMockAuth] = useState(true); // Use mock auth for development
 
     // Calculate generic password strength (0-4)
     const calculateStrength = (pass: string) => {
@@ -55,22 +57,42 @@ const SignupForm: React.FC = () => {
 
         setLoading(true);
 
-        const { error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    full_name: name,
+        try {
+            if (useMockAuth) {
+                // Use mock auth for development
+                const result = mockSignUp(email, password, name);
+                if (result.error) {
+                    setError(result.error.message);
+                } else {
+                    setSuccessMessage("✓ Account created! You can now log in with your credentials.");
+                    setName('');
+                    setEmail('');
+                    setPassword('');
+                    setConfirmPassword('');
+                }
+            } else {
+                // Use real Supabase auth
+                const { error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: name,
+                        }
+                    }
+                });
+
+                if (error) {
+                    setError(error.message);
+                } else {
+                    setSuccessMessage("Registration successful! You can now log in.");
                 }
             }
-        });
-
-        if (error) {
-            setError(error.message);
-        } else {
-            setSuccessMessage("Registration successful! You can now log in.");
+        } catch (err: any) {
+            setError(err?.message || "Signup failed. Please try again.");
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const handleGoogleSignup = async () => {
