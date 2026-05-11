@@ -1,9 +1,10 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { supabase } from '../lib/supabase';
 import { User, Bell, Shield, Key, Globe, Check, AlertTriangle, Monitor, Save, Clock } from 'lucide-react';
 import { TIMEZONE_OPTIONS, getUTCOffset } from '../lib/timezone';
+import { getMockCurrentUser, updateMockUser } from '../lib/mockAuth';
 
 const Settings: React.FC = () => {
     const navigate = useNavigate();
@@ -25,6 +26,14 @@ const Settings: React.FC = () => {
 
     useEffect(() => {
         const fetchUser = async () => {
+            const mockUser = getMockCurrentUser();
+            if (mockUser) {
+                const name = mockUser.name || mockUser.email?.split('@')[0] || 'User';
+                setUserName(name);
+                setOriginalName(name);
+                setEmail(mockUser.email || '');
+                return;
+            }
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
                 const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
@@ -68,9 +77,11 @@ const Settings: React.FC = () => {
     const handleLogoutAll = async () => {
         try {
             // Logs out the user from the current session and all other active sessions across devices
+            localStorage.removeItem('tg_authenticated');
+            localStorage.removeItem('tg_session');
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
-            navigate('/');
+            window.location.href = '/';
         } catch (error: any) {
             console.error('Error logging out:', error.message);
         }
@@ -80,15 +91,25 @@ const Settings: React.FC = () => {
         setPasswordError('');
         setIsSaving(true);
         let nameUpdated = false;
+        
+        const isMockAuth = !!getMockCurrentUser();
 
         // 1. Update Profile Name
         if (userName.trim() && userName !== originalName) {
-            const { error: nameError } = await supabase.auth.updateUser({
-                data: { full_name: userName.trim() }
-            });
+            let error = null;
+            
+            if (isMockAuth) {
+                const res = updateMockUser({ name: userName.trim() });
+                error = res.error;
+            } else {
+                const res = await supabase.auth.updateUser({
+                    data: { full_name: userName.trim() }
+                });
+                error = res.error;
+            }
 
-            if (nameError) {
-                console.error("Name update error:", nameError);
+            if (error) {
+                console.error("Name update error:", error);
                 setSaveMessage("Failed to update name.");
                 setIsSaving(false);
                 return;
@@ -101,28 +122,36 @@ const Settings: React.FC = () => {
         if (newPassword) {
             if (newPassword.length < 6) {
                 setPasswordError('Password must be at least 6 characters.');
+                setIsSaving(false);
                 return;
             }
             if (newPassword !== confirmPassword) {
                 setPasswordError('Passwords do not match.');
+                setIsSaving(false);
                 return;
             }
 
-            setIsSaving(true);
-            const { error } = await supabase.auth.updateUser({
-                password: newPassword
-            });
+            let error = null;
+            if (isMockAuth) {
+                const res = updateMockUser({ password: newPassword });
+                error = res.error;
+            } else {
+                const res = await supabase.auth.updateUser({ password: newPassword });
+                error = res.error;
+            }
 
             if (error) {
-                console.error("Supabase password update error:", error);
+                console.error("Password update error:", error);
                 setPasswordError("Failed: " + error.message);
                 setIsSaving(false);
                 return;
             }
 
             // Password changed successfully - force login with new password
+            localStorage.removeItem('tg_authenticated');
+            localStorage.removeItem('tg_session');
             await supabase.auth.signOut();
-            navigate('/', { replace: true });
+            window.location.href = '/';
             return;
         }
 
@@ -151,8 +180,16 @@ const Settings: React.FC = () => {
                         </p>
                     </div>
                     {saveMessage && (
-                        <div className="flex items-center text-sm text-[#0f8246] bg-[#d4ebd9] dark:bg-[#0f8246]/20 px-3 py-1.5 rounded-lg border border-[#0f8246]/30">
-                            <Check size={16} className="mr-1.5" />
+                        <div className={`flex items-center text-sm px-3 py-1.5 rounded-lg border ${
+                            saveMessage.includes('Failed') 
+                            ? 'text-red-600 bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20' 
+                            : 'text-[#0f8246] bg-[#d4ebd9] dark:bg-[#0f8246]/20 border-[#0f8246]/30'
+                        }`}>
+                            {saveMessage.includes('Failed') ? (
+                                <AlertTriangle size={16} className="mr-1.5" />
+                            ) : (
+                                <Check size={16} className="mr-1.5" />
+                            )}
                             {saveMessage}
                         </div>
                     )}
