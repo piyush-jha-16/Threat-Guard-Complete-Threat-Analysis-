@@ -22,18 +22,24 @@ export interface ScanRecord {
 }
 
 // ── Persistence key ─────────────────────────────────────────────────────────
-const STORAGE_KEY = 'tg_scan_history';
+const STORAGE_KEY_PREFIX = 'tg_scan_history';
 const MAX_HISTORY = 200;
 
 // ── Internal state ───────────────────────────────────────────────────────────
 let _history: ScanRecord[] = [];
 let _listeners: Array<() => void> = [];
+let _scopeId = 'anon';
+
+function _scopeKey(): string {
+    return `${STORAGE_KEY_PREFIX}:${_scopeId}`;
+}
 
 // Load from localStorage on module initialisation
 function _load(): void {
     try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const raw = localStorage.getItem(_scopeKey());
         if (raw) _history = JSON.parse(raw) as ScanRecord[];
+        else _history = [];
     } catch {
         _history = [];
     }
@@ -41,7 +47,7 @@ function _load(): void {
 
 function _save(): void {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(_history.slice(0, MAX_HISTORY)));
+        localStorage.setItem(_scopeKey(), JSON.stringify(_history.slice(0, MAX_HISTORY)));
     } catch {
         // Storage quota exceeded – ignore
     }
@@ -104,7 +110,19 @@ export function get30DaySummary(): { clean: number; suspicious: number; critical
 /** Clear all history (for testing / user reset). */
 export function clearHistory(): void {
     _history = [];
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(_scopeKey());
+    _notify();
+}
+
+/**
+ * Switch scan-history storage scope (typically Supabase user id).
+ * Every scope gets its own isolated dashboard history.
+ */
+export function setHistoryScope(scopeId?: string | null): void {
+    const nextScope = scopeId?.trim() || 'anon';
+    if (nextScope === _scopeId) return;
+    _scopeId = nextScope;
+    _load();
     _notify();
 }
 

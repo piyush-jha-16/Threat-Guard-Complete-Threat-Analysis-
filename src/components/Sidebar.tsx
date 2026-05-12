@@ -12,7 +12,7 @@ import {
     Network,
     X
 } from 'lucide-react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 interface SidebarProps {
@@ -20,12 +20,8 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
-    const navigate = useNavigate();
-
     const handleLogout = async () => {
         try {
-            localStorage.removeItem('tg_authenticated');
-            localStorage.removeItem('tg_session');
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
             window.location.href = '/';

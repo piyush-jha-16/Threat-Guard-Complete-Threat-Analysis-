@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './lib/supabase';
-import { getMockCurrentUser } from './lib/mockAuth';
+import { setHistoryScope } from './lib/scanStore';
 import AuthLayout from './components/AuthLayout';
 import AuthCard from './components/AuthCard';
 import Dashboard from './pages/Dashboard';
@@ -18,22 +18,14 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check for mock auth session first
-    const mockUser = getMockCurrentUser();
-    const isMockAuthenticated = localStorage.getItem('tg_authenticated') === 'true';
-    
-    if (mockUser || isMockAuthenticated) {
-      setIsAuthenticated(true);
-      setLoading(false);
-      return;
-    }
-
     // Get initial Supabase session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      setHistoryScope(session?.user?.id);
       setIsAuthenticated(!!session);
       setLoading(false);
     }).catch((err) => {
-      console.warn('Supabase session check (using mock auth):', err.message);
+      console.warn('Supabase session check failed:', err.message);
+      setHistoryScope(null);
       setLoading(false);
     });
 
@@ -41,6 +33,7 @@ function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      setHistoryScope(session?.user?.id);
       setIsAuthenticated(!!session);
     });
 

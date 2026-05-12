@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { supabase } from '../lib/supabase';
 import { User, Bell, Shield, Key, Globe, Check, AlertTriangle, Monitor, Save, Clock } from 'lucide-react';
 import { TIMEZONE_OPTIONS, getUTCOffset } from '../lib/timezone';
-import { getMockCurrentUser, updateMockUser } from '../lib/mockAuth';
 
 const Settings: React.FC = () => {
-    const navigate = useNavigate();
     const [userName, setUserName] = useState<string>('');
     const [originalName, setOriginalName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
@@ -26,14 +23,6 @@ const Settings: React.FC = () => {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const mockUser = getMockCurrentUser();
-            if (mockUser) {
-                const name = mockUser.name || mockUser.email?.split('@')[0] || 'User';
-                setUserName(name);
-                setOriginalName(name);
-                setEmail(mockUser.email || '');
-                return;
-            }
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
                 const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
@@ -77,8 +66,6 @@ const Settings: React.FC = () => {
     const handleLogoutAll = async () => {
         try {
             // Logs out the user from the current session and all other active sessions across devices
-            localStorage.removeItem('tg_authenticated');
-            localStorage.removeItem('tg_session');
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
             window.location.href = '/';
@@ -91,22 +78,13 @@ const Settings: React.FC = () => {
         setPasswordError('');
         setIsSaving(true);
         let nameUpdated = false;
-        
-        const isMockAuth = !!getMockCurrentUser();
 
         // 1. Update Profile Name
         if (userName.trim() && userName !== originalName) {
-            let error = null;
-            
-            if (isMockAuth) {
-                const res = updateMockUser({ name: userName.trim() });
-                error = res.error;
-            } else {
-                const res = await supabase.auth.updateUser({
-                    data: { full_name: userName.trim() }
-                });
-                error = res.error;
-            }
+            const res = await supabase.auth.updateUser({
+                data: { full_name: userName.trim() }
+            });
+            const error = res.error;
 
             if (error) {
                 console.error("Name update error:", error);
@@ -131,14 +109,8 @@ const Settings: React.FC = () => {
                 return;
             }
 
-            let error = null;
-            if (isMockAuth) {
-                const res = updateMockUser({ password: newPassword });
-                error = res.error;
-            } else {
-                const res = await supabase.auth.updateUser({ password: newPassword });
-                error = res.error;
-            }
+            const res = await supabase.auth.updateUser({ password: newPassword });
+            const error = res.error;
 
             if (error) {
                 console.error("Password update error:", error);
@@ -148,8 +120,6 @@ const Settings: React.FC = () => {
             }
 
             // Password changed successfully - force login with new password
-            localStorage.removeItem('tg_authenticated');
-            localStorage.removeItem('tg_session');
             await supabase.auth.signOut();
             window.location.href = '/';
             return;

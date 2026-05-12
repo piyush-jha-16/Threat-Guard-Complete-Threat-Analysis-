@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { KeyRound, ShieldCheck } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { mockLogin } from '../lib/mockAuth';
 
 const LoginForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const [useMockAuth] = useState(true); // Use mock auth for development
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -22,31 +20,17 @@ const LoginForm: React.FC = () => {
         setLoading(true);
 
         try {
-            if (useMockAuth) {
-                // Use mock auth for development
-                const result = mockLogin(email, password);
-                if (result.error) {
-                    setError(result.error.message);
-                    setLoading(false);
-                } else {
-                    // Simulate login success by storing session and redirecting
-                    localStorage.setItem('tg_authenticated', 'true');
-                    window.location.href = '/dashboard';
-                }
-            } else {
-                // Use real Supabase auth
-                const { error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
 
-                if (error) {
-                    setError(error.message);
-                    setLoading(false);
-                }
-                // If successful, onAuthStateChange in App.tsx will automatically redirect the user.
-                // We leave loading=true so the spinner continues while the redirect occurs.
+            if (error) {
+                setError(error.message);
+                setLoading(false);
             }
+            // If successful, onAuthStateChange in App.tsx will automatically redirect the user.
+            // We leave loading=true so the spinner continues while the redirect occurs.
         } catch (err: any) {
             setError(err?.message || "Login failed. Please try again.");
             setLoading(false);
@@ -58,6 +42,12 @@ const LoginForm: React.FC = () => {
         setError(null);
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
+            options: {
+                redirectTo: `${window.location.origin}/`,
+                queryParams: {
+                    prompt: 'select_account',
+                },
+            },
         });
         if (error) {
             setError(error.message);

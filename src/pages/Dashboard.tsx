@@ -6,7 +6,6 @@ import TopDetectionRules, { type TopDetectionRule } from '../components/dashboar
 import ScanActivityTable, { type ScanActivity } from '../components/dashboard/ScanActivityTable';
 import { supabase } from '../lib/supabase';
 import { Clock } from 'lucide-react';
-import { getMockCurrentUser } from '../lib/mockAuth';
 import {
     subscribe,
     getStats,
@@ -76,11 +75,6 @@ const Dashboard: React.FC = () => {
     useEffect(() => {
         // Fetch username
         const fetchUser = async () => {
-            const mockUser = getMockCurrentUser();
-            if (mockUser) {
-                setUserName(mockUser.name || mockUser.email?.split('@')[0] || 'User');
-                return;
-            }
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
                 const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
